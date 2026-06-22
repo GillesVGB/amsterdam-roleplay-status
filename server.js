@@ -38,6 +38,11 @@ app.get("/", async (req, res) => {
       status: "online",
       serverName: data.hostname || "Amsterdam Roleplay",
       join: "https://cfx.re/join/8emey4v",
+
+      queue: 0,
+      maintenance: false,
+      maintenanceText: "Geen melding actief",
+
       updatedAt: new Date().toISOString()
     });
 
@@ -49,6 +54,11 @@ app.get("/", async (req, res) => {
       status: "offline",
       serverName: "Amsterdam Roleplay",
       join: "https://cfx.re/join/8emey4v",
+
+      queue: 0,
+      maintenance: true,
+      maintenanceText: "Server is momenteel niet bereikbaar.",
+
       error: error.message,
       updatedAt: new Date().toISOString()
     });
