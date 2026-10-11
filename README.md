@@ -1,21 +1,17 @@
-# Heerlen Roleplay — txAdmin status
+# Heerlen Roleplay — FiveM status
 
-Deze API leest alleen `http://31.56.25.179:40120/host/status`. Publieke antwoorden bevatten de status en spelerstelling; geen serverpaden of authenticatiegegevens.
+Deze API probeert eerst `http://31.56.25.179:30120/dynamic.json` via een gewone Node.js HTTP-aanvraag. Er zijn geen txAdmin-gegevens of hostingtokens nodig.
 
-## Bij VibeGAMES
+## Fallback
 
-Laat VibeGAMES de boot-environmentvariabele `TXHOST_API_TOKEN` instellen op een afzonderlijke willekeurige token van 16–48 letters, cijfers, `_` of `-`. Dit hoort bij het opstartproces van txAdmin en niet in server.cfg. Spreek een eventueel benodigde herstart af met je hoster.
+Als de directe IP-aanvraag mislukt, leest de API de officiële FiveM-serverlijst op `https://frontend.cfx-services.net/api/servers/single/y994lqm`. De lijst moet exact `31.56.25.179:30120` bevatten; verouderde en ongeldige gegevens worden afgewezen. `source`, `reportedAt` en `approximate` maken zichtbaar dat deze telling enkele minuten kan achterlopen.
 
-## Bij Vercel
+## Website
 
-Voeg in project `amsterdam-roleplay-status` dezelfde waarde toe als geheime Production-variabele `TXADMIN_API_TOKEN`. Deel de token niet in de chat. Daarna opnieuw deployen.
-
-`TXADMIN_STATUS_URL` is optioneel; standaard is het bovenstaande adres. De website blijft `https://amsterdam-roleplay-status.vercel.app/` gebruiken.
-
-Ontbrekende configuratie, verkeerd token en time-outs worden afzonderlijk gemeld. Onderhoud en wachtrijlengte worden niet verzonnen.
+De website gebruikt `https://amsterdam-roleplay-status.vercel.app/`. De API geeft online-status en de geverifieerde spelerstelling door. Fouten verzinnen geen spelersstand of onderhoud.
 
 ## Lokaal
 
-`npm install`, daarna `npm start`. Controles: `node --test test/tx-status.test.js`.
+`npm install`, daarna `npm start`. Controles: `node --test test/fivem-status.test.js`.
 
-Bij een volgende GitHub-deployment moeten server.js, tx-status.js en vercel.json uit dit pakket ook in de gekoppelde repository staan.
+Vercel gebruikt de gekoppelde GitHub-repository. Regio: Frankfurt. Alle API-antwoorden sturen no-store-headers; gelijktijdige aanvragen worden gedeeld en resultaten worden maximaal 10 seconden in de functie gecachet.

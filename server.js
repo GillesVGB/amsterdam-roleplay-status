@@ -1,11 +1,11 @@
 import express from 'express';
-import {createTxStatusReader} from './tx-status.js';
+import {createFiveMStatusReader} from './fivem-status.js';
 const app=express();
-const readStatus=createTxStatusReader({url:process.env.TXADMIN_STATUS_URL||'http://31.56.25.179:40120/host/status',token:process.env.TXADMIN_API_TOKEN||''});
+const readStatus=createFiveMStatusReader();
 app.disable('x-powered-by');
 app.use((req,res,next)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Methods','GET, HEAD, OPTIONS');res.setHeader('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.setHeader('Pragma','no-cache');res.setHeader('Expires','0');if(req.method==='OPTIONS')return res.sendStatus(204);next();});
 app.get(['/','/api/status'],async(req,res)=>res.json(await readStatus()));
-app.get('/healthz',(req,res)=>res.json({ok:true,service:'Heerlen Roleplay txAdmin status'}));
+app.get('/healthz',(req,res)=>res.json({ok:true,service:'Heerlen Roleplay FiveM status'}));
 const port=Number(process.env.PORT)||3000;
-app.listen(port,()=>console.log('Heerlen txAdmin status API listening on port '+port));
+app.listen(port,()=>console.log('Heerlen FiveM status API listening on port '+port));
 export default app;
