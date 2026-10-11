@@ -50,7 +50,7 @@ app.get("/", async (req, res) => {
     res.json({
       online: false,
       players: 0,
-      maxPlayers: 128,
+      maxPlayers: 8,
       status: "offline",
       serverName: "Heerlen Roleplay",
       join: "https://cfx.re/join/y994lqm",
