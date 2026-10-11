@@ -2,7 +2,7 @@ import express from "express";
 
 const app = express();
 
-const FIVEM_DYNAMIC_URL = "http://185.229.35.13:30120/dynamic.json";
+const FIVEM_DYNAMIC_URL = "http://31.56.25.179:30120/dynamic.json";
 
 app.get("/", async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,8 +36,8 @@ app.get("/", async (req, res) => {
       players: Number(data.clients) || 0,
       maxPlayers: Number(data.sv_maxclients) || 0,
       status: "online",
-      serverName: data.hostname || "Amsterdam Roleplay",
-      join: "https://cfx.re/join/8emey4v",
+      serverName: data.hostname || "Heerlen Roleplay",
+      join: "https://cfx.re/join/y994lqm",
 
       queue: 0,
       maintenance: false,
@@ -52,8 +52,8 @@ app.get("/", async (req, res) => {
       players: 0,
       maxPlayers: 128,
       status: "offline",
-      serverName: "Amsterdam Roleplay",
-      join: "https://cfx.re/join/8emey4v",
+      serverName: "Heerlen Roleplay",
+      join: "https://cfx.re/join/y994lqm",
 
       queue: 0,
       maintenance: true,
