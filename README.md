@@ -4,7 +4,7 @@ Deze API probeert eerst `http://31.56.25.179:30120/dynamic.json` via een gewone 
 
 ## Fallback
 
-Als de directe IP-aanvraag mislukt, leest de API de officiële FiveM-serverlijst op `https://frontend.cfx-services.net/api/servers/single/y994lqm`. De lijst moet exact `31.56.25.179:30120` bevatten; verouderde en ongeldige gegevens worden afgewezen. `source`, `reportedAt` en `approximate` maken zichtbaar dat deze telling enkele minuten kan achterlopen.
+Als de directe IP-aanvraag mislukt, blijft de actuele status `unreachable`, met onbekende spelersstand en capaciteit. De officiële FiveM-serverlijst kan een eerdere melding leveren in `lastKnown`, maar bepaalt nooit de actuele online-status. De lijst moet exact `31.56.25.179:30120` bevatten; verouderde en ongeldige gegevens worden afgewezen. Alleen een geldige, directe IP-respons bevestigt `online`.
 
 ## Website
 

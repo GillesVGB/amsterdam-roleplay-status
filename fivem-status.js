@@ -25,7 +25,7 @@ export function createFiveMStatusReader({url='http://31.56.25.179:30120/dynamic.
   try{const data=await requestJson(url),players=count(data.clients),capacity=count(data.sv_maxclients);if(players===null||capacity===null||capacity<1||players>capacity)throw Error('Invalid counts');return {...base,online:true,status:'online',players,maxPlayers:capacity,capacity,approximate:false,message:'De FiveM-server is bereikbaar. Je kunt de stad in.'};}
   catch(error){
    const fallback=await listing;
-   if(fallback)return {...base,...fallback,online:true,status:'online'};
+   if(fallback)return {...base,error:'FIVEM_UNREACHABLE',lastKnown:{players:fallback.players,capacity:fallback.capacity,reportedAt:fallback.reportedAt,source:fallback.source},message:'De server reageert niet op de statuscontrole. De FiveM-serverlijst bevat alleen een eerdere melding.'};
    console.warn('FiveM status failed',{code:error.code||'INVALID_RESPONSE',stage:error.stage||'validation'});return {...base,error:'FIVEM_UNREACHABLE',message:'De actuele FiveM-status kan tijdelijk niet worden opgehaald.'};
   }
  }
