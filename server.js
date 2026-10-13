@@ -1,10 +1,14 @@
 import express from 'express';
 import {createFiveMStatusReader} from './fivem-status.js';
+import {getCache} from '@vercel/functions';
+import {createHeartbeatService} from './heartbeat.js';
 const app=express();
 const readStatus=createFiveMStatusReader();
+const heartbeat=createHeartbeatService({cache:getCache({namespace:'amsterdam-roleplay-status:fivem:v1'}),token:process.env.FIVEM_HEARTBEAT_TOKEN||''});
 app.disable('x-powered-by');
 app.use((req,res,next)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Methods','GET, HEAD, OPTIONS');res.setHeader('Cache-Control','no-store, no-cache, must-revalidate, proxy-revalidate');res.setHeader('Pragma','no-cache');res.setHeader('Expires','0');if(req.method==='OPTIONS')return res.sendStatus(204);next();});
-app.get(['/','/api/status'],async(req,res)=>res.json(await readStatus()));
+app.post('/api/heartbeat',express.json({limit:'1kb'}),async(req,res)=>{const result=await heartbeat.receive(req.get('authorization'),req.body);if(result.code===204)return res.status(204).end();res.status(result.code).json({error:result.error});});
+app.get(['/','/api/status'],async(req,res)=>res.json(await heartbeat.read()||await readStatus()));
 app.get('/healthz',(req,res)=>res.json({ok:true,service:'Heerlen Roleplay FiveM status'}));
 const port=Number(process.env.PORT)||3000;
 app.listen(port,()=>console.log('Heerlen FiveM status API listening on port '+port));
