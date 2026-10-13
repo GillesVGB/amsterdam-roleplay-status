@@ -16,15 +16,23 @@ export function requestJsonNative(url,{timeoutMs=4000}={}){
  });
 }
 const count=value=>{if(value===null||value===undefined||value==='')return null;const n=Number(value);return Number.isInteger(n)&&n>=0&&n<=10000?n:null;};
-export function createFiveMStatusReader({url='http://31.56.25.179:30120/dynamic.json',requestJson=requestJsonNative,listingFetcher=fetch,cacheMs=10000}={}){
+// FXServer routes by path prefix. This suffix reaches the same live handler
+// when a host filters requests to the bare /dynamic.json path.
+const statusUrl='http://31.56.25.179:30120/dynamic.json/status';
+export function createFiveMStatusReader({url=statusUrl,fallbackUrl=url===statusUrl?'http://31.56.25.179:30120/dynamic.json':null,requestJson=requestJsonNative,listingFetcher=fetch,cacheMs=10000}={}){
  let cached=null,pending=null;
  async function read(){
   const stamp=new Date().toISOString();
   const base={serverName:'Heerlen Roleplay',source:'FiveM',join:'fivem://connect/31.56.25.179:30120',joinUrl:'fivem://connect/31.56.25.179:30120',online:false,status:'unreachable',players:null,maxPlayers:null,capacity:null,queue:null,maintenance:false,maintenanceText:'',updatedAt:stamp,checkedAt:stamp};
-  const listing=readListing(listingFetcher).catch(()=>null);
-  try{const data=await requestJson(url),players=count(data.clients),capacity=count(data.sv_maxclients);if(players===null||capacity===null||capacity<1||players>capacity)throw Error('Invalid counts');return {...base,online:true,status:'online',players,maxPlayers:capacity,capacity,approximate:false,message:'De FiveM-server is bereikbaar. Je kunt de stad in.'};}
+  let listing;
+  try{
+   let data;
+   try{data=await requestJson(url);}catch(error){listing=readListing(listingFetcher).catch(()=>null);if(!fallbackUrl)throw error;data=await requestJson(fallbackUrl);}
+   const players=count(data?.clients),capacity=count(data?.sv_maxclients);if(players===null||capacity===null||capacity<1||players>capacity)throw Error('Invalid counts');
+   const checkedAt=new Date().toISOString();return {...base,online:true,status:'online',players,maxPlayers:capacity,capacity,approximate:false,updatedAt:checkedAt,checkedAt,message:'De FiveM-server is bereikbaar. Je kunt de stad in.'};
+  }
   catch(error){
-   const fallback=await listing;
+   const fallback=await (listing||readListing(listingFetcher).catch(()=>null));
    if(fallback)return {...base,error:'FIVEM_UNREACHABLE',lastKnown:{players:fallback.players,capacity:fallback.capacity,reportedAt:fallback.reportedAt,source:fallback.source},message:'De server reageert niet op de statuscontrole. De FiveM-serverlijst bevat alleen een eerdere melding.'};
    console.warn('FiveM status failed',{code:error.code||'INVALID_RESPONSE',stage:error.stage||'validation'});return {...base,error:'FIVEM_UNREACHABLE',message:'De actuele FiveM-status kan tijdelijk niet worden opgehaald.'};
   }
