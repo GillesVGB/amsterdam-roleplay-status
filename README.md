@@ -1,6 +1,6 @@
 # Heerlen Roleplay — FiveM status
 
-Deze API leest `http://31.56.25.179:30120/dynamic.json/status` via een gewone Node.js HTTP-aanvraag. FXServer behandelt dit subpad met dezelfde `dynamic.json`-handler. Op deze host loopt de aanvraag naar het kale `/dynamic.json`-pad vast, terwijl het subpad direct de actuele telling geeft. Er zijn geen txAdmin-gegevens of hostingtokens nodig.
+Deze API leest `http://31.56.25.179:30120/dynamic.json/status` via een gewone Node.js HTTP-aanvraag. FXServer behandelt dit subpad met dezelfde `dynamic.json`-handler. Op deze host loopt de aanvraag naar het kale `/dynamic.json`-pad vast. De HTTP-client onderdrukt ook de automatische `Connection`-header: aanvragen met die header liepen bij controles eveneens vast. Na het antwoord of een time-out wordt de socket altijd gesloten. Er zijn geen txAdmin-gegevens of hostingtokens nodig.
 
 ## Fallback
 

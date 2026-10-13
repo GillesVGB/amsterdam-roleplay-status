@@ -3,8 +3,8 @@ import http from 'node:http';
 export function requestJsonNative(url,{timeoutMs=4000}={}){
  return new Promise((resolve,reject)=>{
   let connected=false,finished=false,timer;
-  const finish=(error,value)=>{if(finished)return;finished=true;clearTimeout(timer);if(error){error.stage=connected?'http-response':'tcp-connect';reject(error);}else resolve(value);};
-  const req=http.get(url,{agent:false,headers:{Accept:'application/json',Connection:'close','User-Agent':'HeerlenRoleplayStatus/1.0'}},response=>{
+  const finish=(error,value)=>{if(finished)return;finished=true;clearTimeout(timer);req.destroy();if(error){error.stage=connected?'http-response':'tcp-connect';reject(error);}else resolve(value);};
+  const req=http.request(url,{agent:false,headers:{Accept:'application/json','User-Agent':'HeerlenRoleplayStatus/1.0'}},response=>{
    let body='';response.setEncoding('utf8');
    response.on('data',chunk=>{body+=chunk;if(body.length>65536)req.destroy(Object.assign(Error('Response too large'),{code:'BODY_TOO_LARGE'}));});
    response.on('error',error=>finish(error));
@@ -13,6 +13,10 @@ export function requestJsonNative(url,{timeoutMs=4000}={}){
   req.on('socket',socket=>{socket.once('connect',()=>{connected=true;});});
   req.on('error',error=>finish(error));
   timer=setTimeout(()=>req.destroy(Object.assign(Error('Request timed out'),{code:'TIMEOUT'})),timeoutMs);
+  // The host stalls requests with an explicit Connection header. Removing it
+  // before end() also suppresses Node's default header; finish closes the socket.
+  req.removeHeader('Connection');
+  req.end();
  });
 }
 const count=value=>{if(value===null||value===undefined||value==='')return null;const n=Number(value);return Number.isInteger(n)&&n>=0&&n<=10000?n:null;};

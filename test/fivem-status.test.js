@@ -24,6 +24,7 @@ test('subpath reads live 0/64 counts while the bare dynamic endpoint stalls', as
   const paths = [];
   await withServer((req, res) => {
     paths.push(req.url);
+    if (req.headers.connection) return;
     if (req.url !== '/dynamic.json/status') return;
     res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({clients: 0, sv_maxclients: '64'}));
